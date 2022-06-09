@@ -1,4 +1,4 @@
-module github.com/shaoyuan1943/fastudp
+module github.com/glenn-wang/fastudp
 
 go 1.15
 

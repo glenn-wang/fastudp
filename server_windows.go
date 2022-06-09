@@ -6,7 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/shaoyuan1943/fastudp/netudp"
+	"github.com/glenn-wang/fastudp/netudp"
 )
 
 type Server struct {

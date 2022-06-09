@@ -1,9 +1,10 @@
+//go:build linux
 // +build linux
 
 package fastudp
 
 import (
-	"github.com/shaoyuan1943/fastudp/netudp"
+	"github.com/glenn-wang/fastudp/netudp"
 	"golang.org/x/sys/unix"
 )
 

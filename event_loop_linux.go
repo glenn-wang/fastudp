@@ -1,3 +1,4 @@
+//go:build linux
 // +build linux
 
 package fastudp
@@ -10,8 +11,8 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/shaoyuan1943/fastudp/netpoll"
-	"github.com/shaoyuan1943/fastudp/netudp"
+	"github.com/glenn-wang/fastudp/netpoll"
+	"github.com/glenn-wang/fastudp/netudp"
 	"golang.org/x/sys/unix"
 )
 
