@@ -29,9 +29,6 @@ func main() {
 	defer s.Shutdown()
 
 	select {}
-
-	// eh.Statd.Tick()
-
 }
 
 // type eh3 struct {
@@ -48,3 +45,5 @@ func main() {
 
 //  eh := &eh3{}
 // s, err := fastudp.NewUDPServer("udp4", "0.0.0.0:4321", true, 4, 1024, eh)
+
+// eh.Statd.Tick()
