@@ -16,7 +16,7 @@ import (
 
 type Server struct {
 	wg      sync.WaitGroup
-	handler EventHandler
+	handler Handler
 	loops   map[int]*eventLoop
 	wp      chan []byte
 	pool    sync.Pool
@@ -24,7 +24,7 @@ type Server struct {
 	sync.Mutex
 }
 
-func NewUDPServer(network, addr string, reusePort bool, listenerN int, mtu int, handler EventHandler) (*Server, error) {
+func NewUDPServer(network, addr string, reusePort bool, listenerN int, mtu int, handler Handler) (*Server, error) {
 	if !netudp.IsUDP(network) {
 		return nil, fmt.Errorf("unknown network: %v", network)
 	}

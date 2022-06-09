@@ -103,7 +103,7 @@ func (loop *eventLoop) readLoop() {
 				return
 			}
 
-			loop.svr.handler.OnReaded(data, addr)
+			loop.svr.handler(data, addr)
 		})
 	}
 }
