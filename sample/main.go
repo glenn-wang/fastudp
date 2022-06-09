@@ -10,7 +10,6 @@ import (
 
 func myHandler(frame []byte, addr *net.UDPAddr) {
 	log.Println("myHandler remote addr len: ", len(addr.IP))
-
 	log.Println("myHandler recv packet")
 }
 
