@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 
@@ -14,7 +13,7 @@ func myHandler(frame []byte, addr *net.UDPAddr) {
 }
 
 func main() {
-	fmt.Println("Hi")
+	log.Println("Hi")
 
 	s, err := fastudp.NewUDPServer("udp4", "0.0.0.0:4321", true, 4, 1024, myHandler)
 
