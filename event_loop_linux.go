@@ -4,6 +4,7 @@
 package fastudp
 
 import (
+	"log"
 	"net"
 	"os"
 	"runtime"
@@ -96,7 +97,7 @@ func (loop *eventLoop) pollEvent(fd int32, events uint32) {
 }
 
 func (loop *eventLoop) readLoop() {
-	for _ = range loop.readNotifyC {
+	for range loop.readNotifyC {
 		loop.rw.ReadFrom(func(data []byte, addr *net.UDPAddr, err error) {
 			if err != nil {
 				loop.Close(err)
@@ -130,6 +131,8 @@ func (loop *eventLoop) writeTo(data []byte, addr *net.UDPAddr) {
 }
 
 func (loop *eventLoop) onEpollout() {
+	log.Println("onEpollout")
+
 	n := len(loop.writeQueue)
 	if n <= 0 {
 		return
