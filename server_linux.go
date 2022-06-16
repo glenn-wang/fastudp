@@ -69,7 +69,7 @@ func (s *Server) start(network, addr string, reusePort bool, listenerN, mtu int)
 
 		loop := newEventLoop(s, l, poller, mtu)
 		s.loops[loop.l.fd] = loop
-		poller.Add(loop.l.fd, "rw")
+		poller.Add(loop.l.fd, "r")
 
 		go loop.run()
 		go loop.readLoop()

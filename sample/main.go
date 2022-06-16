@@ -7,15 +7,23 @@ import (
 	"github.com/glenn-wang/fastudp"
 )
 
+var fastUS *fastudp.Server = nil
+
 func myHandler(frame []byte, addr *net.UDPAddr) {
-	log.Println("myHandler remote addr len: ", len(addr.IP))
-	log.Println("myHandler recv packet")
+	if len(addr.IP) == 4 {
+		log.Println("recv packet; remote addr:", addr.String())
+
+		// fixme: 接收路径 端口处理有误
+		fastUS.WriteTo(frame, addr)
+	}
 }
 
 func main() {
 	log.Println("Hi")
 
-	s, err := fastudp.NewUDPServer("udp4", "0.0.0.0:4321", true, 4, 1024, myHandler)
+	var err error
+
+	fastUS, err = fastudp.NewUDPServer("udp4", "0.0.0.0:4321", true, 4, 1024, myHandler)
 
 	// s, err := fastudp.NewUDPServer("udp6", "[fe80::604:4ff:fe16:1352]:4321", true, 4, 1024, eh)
 	if err != nil {
@@ -25,7 +33,7 @@ func main() {
 	// var poller Poller
 	// poller.fd =
 
-	defer s.Shutdown()
+	defer fastUS.Shutdown()
 
 	select {}
 }
