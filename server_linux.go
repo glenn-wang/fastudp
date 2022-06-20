@@ -15,12 +15,12 @@ import (
 )
 
 type Server struct {
-	wg      sync.WaitGroup
-	handler Handler
-	loops   map[int]*eventLoop
-	wp      chan []byte
-	pool    sync.Pool
-	closed  atomic.Value
+	wg       sync.WaitGroup
+	onReaded Handler
+	loops    map[int]*eventLoop
+	wp       chan []byte
+	pool     sync.Pool
+	closed   atomic.Value
 	sync.Mutex
 }
 
@@ -30,9 +30,9 @@ func NewUDPServer(network, addr string, reusePort bool, listenerN int, mtu int, 
 	}
 
 	svr := &Server{
-		handler: handler,
-		loops:   make(map[int]*eventLoop),
-		wp:      make(chan []byte, WriteEventSize),
+		onReaded: handler,
+		loops:    make(map[int]*eventLoop),
+		wp:       make(chan []byte, WriteEventSize),
 	}
 
 	svr.pool.New = func() interface{} {

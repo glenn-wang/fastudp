@@ -104,7 +104,7 @@ func (loop *eventLoop) readLoop() {
 				return
 			}
 
-			loop.svr.handler(data, addr)
+			loop.svr.onReaded(data, addr)
 		})
 	}
 }
