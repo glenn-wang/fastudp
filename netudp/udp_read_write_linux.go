@@ -5,13 +5,14 @@ package netudp
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"reflect"
 	"unsafe"
 
 	"golang.org/x/sys/unix"
+
+	l "github.com/glenn-wang/fastudp/mylog"
 )
 
 var zero [32]byte
@@ -158,6 +159,8 @@ func (rw *ReaderWriter) WriteTo(data []byte, addr *net.UDPAddr) error {
 }
 
 func (rw *ReaderWriter) writeToIPv4(data []byte, addr *net.UDPAddr) error {
+	l.DEBUG("rw.writeToIPv4")
+
 	rw.sockaddr4.Family = unix.AF_INET
 	port := (*[2]byte)(unsafe.Pointer(&rw.sockaddr4.Port))
 	port[0] = byte(addr.Port >> 8)
@@ -181,7 +184,7 @@ func (rw *ReaderWriter) writeToIPv6(data []byte, addr *net.UDPAddr) error {
 }
 
 func (rw *ReaderWriter) writeto(data uintptr, dataLen uintptr, flags uintptr, sockaddr uintptr, sockaddrSize uintptr) error {
-	log.Println("writeto before sendto")
+	l.DEBUG("writeto before sendto")
 
 	_, _, err := unix.Syscall6(unix.SYS_SENDTO, uintptr(rw.fd), data, dataLen, flags, sockaddr, sockaddrSize)
 	if err != 0 {
@@ -248,7 +251,7 @@ func (rw *ReaderWriter) WriteToN(mmsgs ...*Mmsg) (int, error) {
 		writed++
 	}
 
-	log.Println("WriteToN before sendmmsg")
+	l.DEBUG("WriteToN before sendmmsg")
 
 	_, _, err := unix.Syscall6(unix.SYS_SENDMMSG, uintptr(rw.fd), uintptr(unsafe.Pointer(&mms[0])), uintptr(len(mms)), uintptr(0), 0, 0)
 	if err != 0 {

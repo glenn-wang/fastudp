@@ -1,19 +1,24 @@
 package main
 
 import (
+	"encoding/binary"
 	"log"
 	"net"
 
-	"github.com/glenn-wang/fastudp"
+	fu "github.com/glenn-wang/fastudp"
+
+	l "github.com/glenn-wang/fastudp/mylog"
 )
 
-var fastUS *fastudp.Server = nil
+var fastUS *fu.Server = nil
 
-func myHandler(frame []byte, addr *net.UDPAddr) {
+func onRead(frame []byte, addr *net.UDPAddr) {
 	if len(addr.IP) == 4 {
-		log.Println("recv packet; remote addr:", addr.String())
 
-		// fixme: 接收路径 端口处理有误
+		addr.Port = int(ntohs(uint16(addr.Port)))
+
+		l.DEBUG("recv packet; remote addr: %s", addr.String())
+
 		fastUS.WriteTo(frame, addr)
 	}
 }
@@ -23,7 +28,7 @@ func main() {
 
 	var err error
 
-	fastUS, err = fastudp.NewUDPServer("udp4", "0.0.0.0:4321", true, 4, 1024, myHandler)
+	fastUS, err = fu.NewUDPServer("udp4", "0.0.0.0:4321", true, 4, 1024, onRead)
 
 	// s, err := fastudp.NewUDPServer("udp6", "[fe80::604:4ff:fe16:1352]:4321", true, 4, 1024, eh)
 	if err != nil {
@@ -36,6 +41,14 @@ func main() {
 	defer fastUS.Shutdown()
 
 	select {}
+}
+
+func ntohs(number uint16) uint16 {
+
+	by := make([]byte, 2)
+	binary.LittleEndian.PutUint16(by, uint16(number))
+
+	return binary.BigEndian.Uint16(by)
 }
 
 // type eh3 struct {

@@ -4,7 +4,6 @@
 package fastudp
 
 import (
-	"log"
 	"net"
 	"os"
 	"runtime"
@@ -15,6 +14,8 @@ import (
 	"github.com/glenn-wang/fastudp/netpoll"
 	"github.com/glenn-wang/fastudp/netudp"
 	"golang.org/x/sys/unix"
+
+	l "github.com/glenn-wang/fastudp/mylog"
 )
 
 var (
@@ -110,6 +111,8 @@ func (loop *eventLoop) readLoop() {
 }
 
 func (loop *eventLoop) writeTo(data []byte, addr *net.UDPAddr) {
+	l.DEBUG("loop.writeTo")
+
 	err := loop.rw.WriteTo(data, addr)
 	if err != nil {
 		errno := err.(*os.SyscallError).Unwrap()
@@ -131,7 +134,7 @@ func (loop *eventLoop) writeTo(data []byte, addr *net.UDPAddr) {
 }
 
 func (loop *eventLoop) onEpollout() {
-	log.Println("onEpollout")
+	l.DEBUG("onEpollout")
 
 	n := len(loop.writeQueue)
 	if n <= 0 {
