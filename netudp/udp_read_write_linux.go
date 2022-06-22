@@ -184,7 +184,7 @@ func (rw *ReaderWriter) writeToIPv6(data []byte, addr *net.UDPAddr) error {
 }
 
 func (rw *ReaderWriter) writeto(data uintptr, dataLen uintptr, flags uintptr, sockaddr uintptr, sockaddrSize uintptr) error {
-	l.DEBUG("writeto before sendto")
+	l.DEBUG("rw.writeto before sendto")
 
 	_, _, err := unix.Syscall6(unix.SYS_SENDTO, uintptr(rw.fd), data, dataLen, flags, sockaddr, sockaddrSize)
 	if err != 0 {
