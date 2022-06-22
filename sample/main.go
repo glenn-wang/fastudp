@@ -6,6 +6,7 @@ import (
 	"net"
 
 	fu "github.com/glenn-wang/fastudp"
+	"github.com/glenn-wang/fastudp/netudp"
 
 	l "github.com/glenn-wang/fastudp/mylog"
 )
@@ -19,7 +20,18 @@ func onRead(frame []byte, addr *net.UDPAddr) {
 
 		l.DEBUG("recv packet; remote addr: %s", addr.String())
 
-		fastUS.WriteTo(frame, addr)
+		// sendto ok
+		// fastUS.WriteTo(frame, addr)
+
+		var msg netudp.Mmsg
+		msg.Addr = addr
+		msg.Data = frame
+
+		// sendmmsg directly ok
+		fastUS.WriteToN(&msg)
+		// fastUS.WriteToN(&msg, &msg)
+
+		// fastUS.FillWriteQueue(&msg)
 	}
 }
 

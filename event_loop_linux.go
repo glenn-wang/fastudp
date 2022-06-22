@@ -133,6 +133,7 @@ func (loop *eventLoop) writeTo(data []byte, addr *net.UDPAddr) {
 	}
 }
 
+// 接收事件通知发送
 func (loop *eventLoop) onEpollout() {
 	l.DEBUG("onEpollout")
 

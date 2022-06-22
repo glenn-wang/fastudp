@@ -126,3 +126,37 @@ func (svr *Server) WriteTo(data []byte, addr *net.UDPAddr) {
 
 	loop.writeTo(data, addr)
 }
+
+// 直接发送
+func (svr *Server) WriteToN(mmsgs ...*netudp.Mmsg) (int, error) {
+	if svr.closed.Load().(bool) {
+		return 0, fmt.Errorf("server is closed")
+	}
+
+	svr.Lock()
+	defer svr.Unlock()
+
+	for _, loop := range svr.loops {
+		writed, err := loop.rw.WriteToN(mmsgs...)
+		return writed, err
+	}
+
+	return 0, fmt.Errorf("no usable event loop")
+}
+
+func (svr *Server) FillWriteQueue(mmsgs ...*netudp.Mmsg) (int, error) {
+
+	// for inx := 0; inx < len(mmsgs); inx++ {
+	// 	svr.loops.writeQueue = append()
+	// }
+
+	for _, loop := range svr.loops {
+
+		loop.writeQueue = append(loop.writeQueue, mmsgs...)
+
+		// writed, err := loop.rw.WriteToN(mmsgs...)
+		// return writed, err
+	}
+
+	return 0, nil
+}
