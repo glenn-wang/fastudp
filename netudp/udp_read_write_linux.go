@@ -12,7 +12,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	l "github.com/glenn-wang/fastudp/mylog"
+	zlog "github.com/glenn-wang/fastudp/mylog"
 )
 
 var zero [32]byte
@@ -159,14 +159,14 @@ func (rw *ReaderWriter) WriteTo(data []byte, addr *net.UDPAddr) error {
 }
 
 func (rw *ReaderWriter) writeToIPv4(data []byte, addr *net.UDPAddr) error {
-	l.DEBUG("rw.writeToIPv4")
+	zlog.DEBUG("rw.writeToIPv4")
 
 	rw.sockaddr4.Family = unix.AF_INET
 	port := (*[2]byte)(unsafe.Pointer(&rw.sockaddr4.Port))
 	port[0] = byte(addr.Port >> 8)
 	port[1] = byte(addr.Port)
 
-	copy(rw.sockaddr4.Addr[:], addr.IP)
+	copy(rw.sockaddr4.Addr[:], addr.IP.To4())
 
 	return rw.writeto(uintptr(unsafe.Pointer(&data[0])), uintptr(len(data)), uintptr(0), uintptr(unsafe.Pointer(&rw.sockaddr4)), uintptr(unix.SizeofSockaddrInet4))
 }
@@ -184,7 +184,7 @@ func (rw *ReaderWriter) writeToIPv6(data []byte, addr *net.UDPAddr) error {
 }
 
 func (rw *ReaderWriter) writeto(data uintptr, dataLen uintptr, flags uintptr, sockaddr uintptr, sockaddrSize uintptr) error {
-	l.DEBUG("rw.writeto before sendto")
+	zlog.DEBUG("rw.writeto before sendto")
 
 	_, _, err := unix.Syscall6(unix.SYS_SENDTO, uintptr(rw.fd), data, dataLen, flags, sockaddr, sockaddrSize)
 	if err != 0 {
@@ -229,7 +229,11 @@ func (rw *ReaderWriter) WriteToN(mmsgs ...*Mmsg) (int, error) {
 			port := (*[2]byte)(unsafe.Pointer(&sockaddrInet4.Port))
 			port[0] = byte(msg.Addr.Port >> 8)
 			port[1] = byte(msg.Addr.Port)
-			copy(rw.sockaddr4.Addr[:], msg.Addr.IP)
+			copy(rw.sockaddr4.Addr[:], msg.Addr.IP.To4())
+
+			zlog.DEBUG("WriteToN() dst addr: %s", msg.Addr.IP.String())
+
+			zlog.DEBUG("WriteToN() dst sockaddr4.Addr: %+v", rw.sockaddr4.Addr)
 
 			l := unsafe.Sizeof(*sockaddrInet4)
 			m := &reflect.SliceHeader{
@@ -237,8 +241,16 @@ func (rw *ReaderWriter) WriteToN(mmsgs ...*Mmsg) (int, error) {
 				Cap:  int(l),
 				Len:  int(l),
 			}
+
+			// fixme: has bug
 			name := *(*[]byte)(unsafe.Pointer(m))
 			mms[i].Hdr.Name = (*byte)(unsafe.Pointer(&name[0]))
+
+			// l.DEBUG("WriteToN() dst  *(mms[i].Hdr.Name)")
+
+			zlog.DEBUG("----- %+v", *(mms[i].Hdr.Name))
+			zlog.DEBUG("len(name) ----- %d;", len(name))
+
 			mms[i].Hdr.Namelen = uint32(len(name))
 		}
 
@@ -251,7 +263,7 @@ func (rw *ReaderWriter) WriteToN(mmsgs ...*Mmsg) (int, error) {
 		writed++
 	}
 
-	l.DEBUG("WriteToN before sendmmsg")
+	zlog.DEBUG("WriteToN before sendmmsg")
 
 	_, _, err := unix.Syscall6(unix.SYS_SENDMMSG, uintptr(rw.fd), uintptr(unsafe.Pointer(&mms[0])), uintptr(len(mms)), uintptr(0), 0, 0)
 	if err != 0 {

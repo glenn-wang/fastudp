@@ -24,13 +24,31 @@ func onRead(frame []byte, addr *net.UDPAddr) {
 		// fastUS.WriteTo(frame, addr)
 
 		var msg netudp.Mmsg
-		msg.Addr = addr
+		// msg.Addr = addr
+
+		// msg.Addr.IP.
+
+		// msg.Addr = &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 9981}
+
+		// has bug
+		// msg.Addr = &net.UDPAddr{IP: addr.IP, Port: addr.Port}
+
+		// net.UDPAddr.
+		msg.Addr = &net.UDPAddr{IP: net.ParseIP("172.18.4.101"), Port: addr.Port}
+
+		l.DEBUG("dst: %s;", msg.Addr.String())
+
+		// msg.Addr
+
 		msg.Data = frame
 
 		// sendmmsg directly ok
 		fastUS.WriteToN(&msg)
+
+		// ok
 		// fastUS.WriteToN(&msg, &msg)
 
+		// has bug
 		// fastUS.FillWriteQueue(&msg)
 	}
 }
@@ -40,7 +58,7 @@ func main() {
 
 	var err error
 
-	fastUS, err = fu.NewUDPServer("udp4", "0.0.0.0:4321", true, 4, 1024, onRead)
+	fastUS, err = fu.NewUDPServer("udp4", "172.18.4.62:4321", true, 4, 1024, onRead)
 
 	// s, err := fastudp.NewUDPServer("udp6", "[fe80::604:4ff:fe16:1352]:4321", true, 4, 1024, eh)
 	if err != nil {
